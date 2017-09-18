@@ -25,6 +25,20 @@ namespace AutoMapperIntroduction.AutoMapper
                     var feet = Int32.Parse(source.Height.Substring(0, source.Height.IndexOf("'")));
                     dest.HeightInInches = (feet * 12) + inches; 
                 });
+
+
+            CreateMap<TeamEntity, TeamModel>()
+                //Use ConstructUsing to specify which constructor to use during the mapping
+                .ConstructUsing(dest => new TeamModel(dest.Mascot))
+                //Use AutoMapper.Collection package to map collections to existing collections without re-creating the collection object.
+                .ForMember(dest => dest.Players, opt => opt.MapFrom(source => source.Players));
+
+            CreateMap<CoachEntity, CoachModel>()
+                .ForMember(dest => dest.CoachId, opt => opt.UseValue(0))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(source => source.FirstName + " " + source.LastName))
+                .ForMember(dest => dest.YearsCoaching, opt => opt.NullSubstitute(0))
+                //AlmaMater is not needed in the mapping configuration because we specified the destination with the Attribute
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(source => source.Status));
         }
     }
 }
